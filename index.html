@@ -11,14 +11,6 @@
           <option value="<?= data.products[i] ?>"><?= data.products[i] ?></option>
         <? } ?>
       </select>
-      <? if (data.offerType) { ?>
-        <font>Select offer type</font>
-        <select name="offer-types" id="offer-types">
-          <? for (var i = 0; i < data.offerType.length; i++) { ?>
-            <option value="<?= data.offerType[i] ?>"><?= data.offerType[i] ?></option>
-          <? } ?>
-        </select>
-      <? } ?>
     </form>
   </body>
 </html>
@@ -26,15 +18,15 @@
 <!-- jQuery -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script>
-  var test = google.script.run.withFailureHandler(onFailure).getOfferTypes("admob");
-  console.log(test);
+  function onSuccess(offerTypes) {
+    console.log(offerTypes);
+  };
+  // Look up offerTypes whenever product is changed
   $("#products").change(function() {
-    var productName = $("#products").val();
-    try {
-      var getOfferTypes = google.script.run.withFailureHandler(onFailure).getOfferTypes(productName);
-    } catch(err) {
-      console.log("Could not get offer types");
-    };
-    console.log(getOfferTypes);
+    // Get selected product
+    var product = $("#products").val();
+    // Get offer types for selected product
+    google.script.run.withSuccessHandler(onSuccess).getOfferTypes(product);
+    console.log("product: " + product);
   });
 </script>

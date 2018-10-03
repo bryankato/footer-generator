@@ -11,54 +11,54 @@ var firstCol = 3;
 // get languages for dropdown
 // get footer content
 // show footer content
+function test() {
+  Logger.log("test worked");
+};
 
+// Get a list of products/tabs
+// with option to define index
+// of first tab
 function getProducts(indexStart) {
   // Get spreadsheet
   var ss = SpreadsheetApp.openById(ssId);
+  // Get sheets/tabs/product names
+  // All 3 names can be used interchangeably
   var sheets = ss.getSheets();
-  var tabNames = [];
+  // Initialize list of products
+  var products = [];
+  // Add sheets/tabs/product names to list
   for (var i = indexStart; i < sheets.length; i++) {
-    var tabName = sheets[i].getName();
-    tabNames.push(tabName);
+    var product = sheets[i].getName();
+    products.push(product);
   };
-  return tabNames;
+  return products;
 };
 
 function getOfferTypes(product) {
   // Get spreadsheet
   var ss = SpreadsheetApp.openById(ssId);
+  // Select tab using product/tab name
   var sheet = ss.getSheetByName(product);
+  // Start getting headers while
+  // skipping row and language
+  // columns
   var numCols = sheet.getLastColumn() - firstCol + 1;
-  var offerTypes = sheet.getRange(1, firstCol, 1, numCols);
-  return offerTypes.getValues();
+  // Get range of offer type headers
+  var offerTypesRange = sheet.getRange(1, firstCol, 1, numCols);
+  // Get list of offer types
+  var offerTypes = offerTypesRange.getValues();
+  return offerTypes;
 };
 
 function doGet() {
-  // Initialize data object
-  var data = {};
-  // Get list of products
-  data.products = getProducts(firstTabIndex);
-  // Render the template
+  // Create template from index.html file
   var htmlTemplate = HtmlService.createTemplateFromFile("index");
-  // Push variables to template
+  // Initialize template data
+  var data = {};
+  // Add list of products to template data
+  data.products = getProducts(firstTabIndex);
+  // Merge data with template
   htmlTemplate.data = data;
+  // Render the template with data
   return htmlTemplate.evaluate();
 };
-
-function selectProduct(product) {
-  // Initialize data object
-  var data = {};
-  // Get list of products
-  data.products = getProducts(firstTabIndex);
-  // Get offer types for the selected product
-  data.offerTypes = getOfferType(product, firstCol);
-  // Render the template
-  var htmlTemplate = HtmlService.createTemplateFromFile("index");
-  // Render the template
-  var htmlTemplate = HtmlService.createTemplateFromFile("index");
-  // Push variables to template
-  htmlTemplate.data = data;
-  return htmlTemplate.evaluate();
-};
-
-// need to update the template vars after product is selected
