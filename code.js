@@ -52,6 +52,22 @@ function getOfferTypes(product) {
   return JSON.stringify(offerTypes);
 };
 
+function getLangs(product) {
+  // Get spreadsheet
+  var ss = SpreadsheetApp.openById(ssId);
+  // Select tab using product/tab name
+  var sheet = ss.getSheetByName(product);
+  // Get number of rows
+  var numRows = sheet.getLastRow() - 1;
+  // Get langs
+  var langsRange = sheet.getRange(2, 1, numRows, 2);
+  var langs = langsRange.getValues();
+  Logger.log(langs);
+  // Client side functions can only return strings
+  // so the array must be converted first
+  return JSON.stringify(langs);
+};
+
 function doGet() {
   // Create template from index.html file
   var htmlTemplate = HtmlService.createTemplateFromFile("index");

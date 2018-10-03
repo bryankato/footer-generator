@@ -2,17 +2,33 @@
 <html>
   <head>
     <base target="_top">
+    <style>
+      font {
+        font-family: Roboto;
+        font-size: 12px;
+        line-height: 16px;
+      }
+    </style>
   </head>
   <body>
     <form id="footer-select" autocomplete="on" onsubmit="dummySubmit(); return false;">
-      <font>Select product</font>
-      <select name="products" id="products">
-        <? for (var i = 0; i < data.products.length; i++) { ?>
-          <option value="<?= data.products[i] ?>"><?= data.products[i] ?></option>
-        <? } ?>
-      </select>
-      <font>Select offer type</font>
-      <!-- Append offer type dropdown here -->
+      <section id="product-select">
+        <font>Select product : </font>
+        <select name="products" id="products">
+          <option value="" disabled selected>Select your option</option>
+          <? for (var i = 0; i < data.products.length; i++) { ?>
+            <option value="<?= data.products[i] ?>"><?= data.products[i] ?></option>
+          <? } ?>
+        </select>
+      </section>
+      <section id="offer-select">
+        <font>Select offer type : </font>
+        <!-- Append offer type dropdown here -->
+      </section>
+      <section id="lang-select">
+        <font>Select language : </font>
+        <!-- Append language dropdown here -->
+      </section>
     </form>
   </body>
 </html>
@@ -20,6 +36,11 @@
 <!-- jQuery -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script>
+  $( document ).ready(function() {
+    // Hide offer type and language dropdowns on initial loading
+    $("#offer-select").hide();
+    $("#lang-select").hide();
+  });
   function showOfferTypes(offerObj) {
     // Client side success handler
     // can only return a string
@@ -27,6 +48,7 @@
     var offerTypes = JSON.parse(offerObj)[0];
     // Remove existing dropdown
     $("#offer-type").remove();
+    $("#offer-select").show();
     // Create select/dropdown element
     var s = $("<select />", {name: "offerTypes", id : "offer-type"});
     // Add existing offer types
@@ -34,13 +56,34 @@
       $('<option />', {value: offerTypes[i], text: offerTypes[i]}).appendTo(s);
     }
     // Add the dropdown to the form
-    s.appendTo("#footer-select");
+    s.appendTo("#offer-select");
+  };
+  function showLangs(langObj) {
+    // Client side success handler
+    // can only return a string
+    // so it must be parsed first
+    var langs = JSON.parse(langObj);
+    // Remove existing dropdown
+    $("#langs").remove();
+    $("#lang-select").show();
+    // Create select/dropdown element
+    var s = $("<select />", {name: "langs", id : "langs"});
+    // Add existing languages
+    for(var i in langs) {
+      $('<option />', {value: i, text: langs[i][0] + " - " + langs[i][1]}).appendTo(s);
+    }
+    // Add the dropdown to the form
+    s.appendTo("#lang-select");
   };
   // Look up offerTypes whenever product is changed
   $("#products").change(function() {
+    // Hide offer and language dropdowns when product is updated
+    $("#offer-select").hide();
+    $("#lang-select").hide();
     // Get selected product
     var product = $("#products").val();
     // Get offer types for selected product
     google.script.run.withSuccessHandler(showOfferTypes).getOfferTypes(product);
+    google.script.run.withSuccessHandler(showLangs).getLangs(product);
   });
 </script>
