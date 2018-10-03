@@ -47,7 +47,9 @@ function getOfferTypes(product) {
   var offerTypesRange = sheet.getRange(1, firstCol, 1, numCols);
   // Get list of offer types
   var offerTypes = offerTypesRange.getValues();
-  return offerTypes;
+  // Client side functions can only return strings
+  // so the array must be converted first
+  return JSON.stringify(offerTypes);
 };
 
 function doGet() {

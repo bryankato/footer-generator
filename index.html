@@ -11,6 +11,8 @@
           <option value="<?= data.products[i] ?>"><?= data.products[i] ?></option>
         <? } ?>
       </select>
+      <font>Select offer type</font>
+      <!-- Append offer type dropdown here -->
     </form>
   </body>
 </html>
@@ -18,15 +20,27 @@
 <!-- jQuery -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script>
-  function onSuccess(offerTypes) {
-    console.log(offerTypes);
+  function showOfferTypes(offerObj) {
+    // Client side success handler
+    // can only return a string
+    // so it must be parsed first
+    var offerTypes = JSON.parse(offerObj)[0];
+    // Remove existing dropdown
+    $("#offer-type").remove();
+    // Create select/dropdown element
+    var s = $("<select />", {name: "offerTypes", id : "offer-type"});
+    // Add existing offer types
+    for(var i in offerTypes) {
+      $('<option />', {value: offerTypes[i], text: offerTypes[i]}).appendTo(s);
+    }
+    // Add the dropdown to the form
+    s.appendTo("#footer-select");
   };
   // Look up offerTypes whenever product is changed
   $("#products").change(function() {
     // Get selected product
     var product = $("#products").val();
     // Get offer types for selected product
-    google.script.run.withSuccessHandler(onSuccess).getOfferTypes(product);
-    console.log("product: " + product);
+    google.script.run.withSuccessHandler(showOfferTypes).getOfferTypes(product);
   });
 </script>
