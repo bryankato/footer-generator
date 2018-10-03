@@ -62,10 +62,22 @@ function getLangs(product) {
   // Get langs
   var langsRange = sheet.getRange(2, 1, numRows, 2);
   var langs = langsRange.getValues();
-  Logger.log(langs);
   // Client side functions can only return strings
   // so the array must be converted first
   return JSON.stringify(langs);
+};
+
+function getFooter(product, colIndex, rowIndex) {
+  // Get spreadsheet
+  var ss = SpreadsheetApp.openById(ssId);
+  // Select tab using product/tab name
+  var sheet = ss.getSheetByName(product);
+  var row = Number(rowIndex + 2);
+  var col = Number(colIndex + firstCol);
+  var footer = sheet.getRange(row, col).getValue();
+  // Client side functions can only return strings
+  // so the array must be converted first
+  return JSON.stringify(footer)
 };
 
 function doGet() {

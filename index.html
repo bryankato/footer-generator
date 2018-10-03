@@ -8,6 +8,14 @@
         font-size: 12px;
         line-height: 16px;
       }
+      #footer {
+        padding: 10px;
+        margin: 10px 0;
+        cursor: pointer;
+        background-color: tomato;
+        color: white;
+        display: inline-block;
+      }
     </style>
   </head>
   <body>
@@ -28,6 +36,9 @@
       <section id="lang-select">
         <font>Select language : </font>
         <!-- Append language dropdown here -->
+      </section>
+      <font id="footer">Show my footer</font>
+      <section id="footer-content">
       </section>
     </form>
   </body>
@@ -53,7 +64,7 @@
     var s = $("<select />", {name: "offerTypes", id : "offer-type"});
     // Add existing offer types
     for(var i in offerTypes) {
-      $('<option />', {value: offerTypes[i], text: offerTypes[i]}).appendTo(s);
+      $('<option />', {value: i, text: offerTypes[i]}).appendTo(s);
     }
     // Add the dropdown to the form
     s.appendTo("#offer-select");
@@ -75,6 +86,14 @@
     // Add the dropdown to the form
     s.appendTo("#lang-select");
   };
+  function showFooter(footerObj) {
+    // Client side success handler
+    // can only return a string
+    // so it must be parsed first
+    var footer = JSON.parse(footerObj);
+    console.log(footer);
+    $("#footer-content").text(footer);
+  };
   // Look up offerTypes whenever product is changed
   $("#products").change(function() {
     // Hide offer and language dropdowns when product is updated
@@ -85,5 +104,17 @@
     // Get offer types for selected product
     google.script.run.withSuccessHandler(showOfferTypes).getOfferTypes(product);
     google.script.run.withSuccessHandler(showLangs).getLangs(product);
+  });
+  // Look up footer whenever language is changed
+  $("#footer").click(function() {
+    // Get selected product
+    var product = $("#products").val();
+    var offer = $("#offer-type").val();
+    var lang = $("#langs").val();
+    console.log("product: " + product);
+    console.log("offer: " + offer);
+    console.log("lang: " + lang);
+    // Get offer types for selected product
+    google.script.run.withSuccessHandler(showFooter).getFooter(product, offer, lang);
   });
 </script>
