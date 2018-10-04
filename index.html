@@ -5,8 +5,8 @@
     <style>
       font {
         font-family: Roboto;
-        font-size: 12px;
-        line-height: 16px;
+        font-size: 14px;
+        line-height: 20px;
       }
       #footer {
         padding: 10px;
@@ -16,29 +16,47 @@
         color: white;
         display: inline-block;
       }
+      #footer-display,
+      #footer-source {
+        border: 1px solid #ededed;
+        padding: 10px;
+        font-size: 14px;
+        line-height: 20px;
+      }
+      #footer-display {
+        font-family: Roboto;
+      }
+      #footer-source {
+        font-family: Courier New;
+      }
     </style>
   </head>
   <body>
     <form id="footer-select" autocomplete="on" onsubmit="dummySubmit(); return false;">
-      <section id="product-select">
+      <section id="products">
         <font>Select product : </font>
-        <select name="products" id="products">
-          <option value="" disabled selected>Select your option</option>
+        <select name="products" id="products-select">
+          <option value="" disabled selected>Select your product</option>
           <? for (var i = 0; i < data.products.length; i++) { ?>
             <option value="<?= data.products[i] ?>"><?= data.products[i] ?></option>
           <? } ?>
         </select>
       </section>
-      <section id="offer-select">
+      <section id="offers">
         <font>Select offer type : </font>
         <!-- Append offer type dropdown here -->
       </section>
-      <section id="lang-select">
+      <section id="langs">
         <font>Select language : </font>
         <!-- Append language dropdown here -->
       </section>
       <font id="footer">Show my footer</font>
-      <section id="footer-content">
+      <br/>
+      <font>Footer display</font>
+      <section id="footer-display">
+      </section>
+      <font>Footer source</font>
+      <section id="footer-source">
       </section>
     </form>
   </body>
@@ -49,8 +67,8 @@
 <script>
   $( document ).ready(function() {
     // Hide offer type and language dropdowns on initial loading
-    $("#offer-select").hide();
-    $("#lang-select").hide();
+    // $("#offer-select").hide();
+    // $("#lang-select").hide();
   });
   function showOfferTypes(offerObj) {
     // Client side success handler
@@ -58,45 +76,46 @@
     // so it must be parsed first
     var offerTypes = JSON.parse(offerObj)[0];
     // Remove existing dropdown
-    $("#offer-type").remove();
-    $("#offer-select").show();
+    $("#offers-select").remove();
+    // $("#offer-select").show();
     // Create select/dropdown element
-    var s = $("<select />", {name: "offerTypes", id : "offer-type"});
+    var s = $("<select />", {name: "offerTypes", id : "offers-select"});
     // Add existing offer types
     for(var i in offerTypes) {
       $('<option />', {value: i, text: offerTypes[i]}).appendTo(s);
     }
     // Add the dropdown to the form
-    s.appendTo("#offer-select");
+    s.appendTo("#offers");
   };
   function showLangs(langObj) {
     // Parse string
     var langs = JSON.parse(langObj);
     // Remove existing dropdown
-    $("#langs").remove();
-    $("#lang-select").show();
+    $("#langs-select").remove();
+    // $("#lang-select").show();
     // Create select/dropdown element
-    var s = $("<select />", {name: "langs", id : "langs"});
+    var s = $("<select />", {name: "langs", id : "langs-select"});
     // Add existing languages
     for(var i in langs) {
       $('<option />', {value: i, text: langs[i][0] + " - " + langs[i][1]}).appendTo(s);
     }
     // Add the dropdown to the form
-    s.appendTo("#lang-select");
+    s.appendTo("#langs");
   };
   function showFooter(footerObj) {
     // Parse string
     var footer = JSON.parse(footerObj);
-    // Display footer content
-    $("#footer-content").text(footer);
+    // Display footer content and source
+    $("#footer-display").html(footer);
+    $("#footer-source").text(footer);
   };
   // Look up offerTypes whenever product is changed
-  $("#products").change(function() {
+  $("#products-select").change(function() {
     // Hide offer and language dropdowns when product is updated
-    $("#offer-select").hide();
-    $("#lang-select").hide();
+    $("#offers-select").hide();
+    $("#langs-select").hide();
     // Get selected product
-    var product = $("#products").val();
+    var product = $("#products-select").val();
     // Get offer types for selected product
     google.script.run.withSuccessHandler(showOfferTypes).getOfferTypes(product);
     google.script.run.withSuccessHandler(showLangs).getLangs(product);
@@ -106,9 +125,9 @@
     // Intialize footer parameter object
     var footerParams = {};
     // Add footer parameters to object
-    footerParams.product = $("#products").val();
-    footerParams.offer = $("#offer-type").val();
-    footerParams.lang = $("#langs").val();
+    footerParams.product = $("#products-select").val();
+    footerParams.offer = $("#offers-select").val();
+    footerParams.lang = $("#langs-select").val();
     // Intialize footer filter options
     footerParams.filters = {};
     // Set smart quote filter to "on" by default

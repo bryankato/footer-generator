@@ -84,7 +84,10 @@ function getFooter(footer) {
 
 function footerFilter(content, filter) {
   if (filter.smartQuotes) {
+    // Remove double quotes
     content = content.replace(/“|”/g, '"');
+    // Remove single quotes
+    content = content.replace(/‘|’/g, "'");
   }
   return content;
 };
