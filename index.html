@@ -70,9 +70,7 @@
     s.appendTo("#offer-select");
   };
   function showLangs(langObj) {
-    // Client side success handler
-    // can only return a string
-    // so it must be parsed first
+    // Parse string
     var langs = JSON.parse(langObj);
     // Remove existing dropdown
     $("#langs").remove();
@@ -87,12 +85,9 @@
     s.appendTo("#lang-select");
   };
   function showFooter(footerObj) {
-    // Client side success handler
-    // can only return a string
-    // so it must be parsed first
+    // Parse string
     var footer = JSON.parse(footerObj);
-    // Create filter for curly quotes, etc
-    console.log(footer);
+    // Display footer content
     $("#footer-content").text(footer);
   };
   // Look up offerTypes whenever product is changed
@@ -114,7 +109,10 @@
     footerParams.product = $("#products").val();
     footerParams.offer = $("#offer-type").val();
     footerParams.lang = $("#langs").val();
-    console.log(footerParams);
+    // Intialize footer filter options
+    footerParams.filters = {};
+    // Set smart quote filter to "on" by default
+    footerParams.filters.smartQuotes = true;
     // Get footer content using defined parameters
     google.script.run.withSuccessHandler(showFooter).getFooter(footerParams);
   });

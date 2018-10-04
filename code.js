@@ -62,8 +62,7 @@ function getLangs(product) {
   // Get langs
   var langsRange = sheet.getRange(2, 1, numRows, 2);
   var langs = langsRange.getValues();
-  // Client side functions can only return strings
-  // so the array must be converted first
+  // Stringify array
   return JSON.stringify(langs);
 };
 
@@ -76,15 +75,18 @@ function getFooter(footer) {
   var col = Number(footer.offer) + firstCol;
   Logger.log("row: " + row);
   Logger.log("col: " + col);
-  try {
-    var footerContent = sheet.getRange(row, col).getValue();
-  } catch(err) {
-    Logger.log("row: " + row);
-    Logger.log("col: " + col);
-  };
-  // Client side functions can only return strings
-  // so the array must be converted first
+  var footerContent = sheet.getRange(row, col).getValue();
+  // Filter footer content based on user options
+  footerContent = footerFilter(footerContent, footer.filters);
+  // Stringify content
   return JSON.stringify(footerContent)
+};
+
+function footerFilter(content, filter) {
+  if (filter.smartQuotes) {
+    content = content.replace(/“|”/g, '"');
+  }
+  return content;
 };
 
 function doGet() {
