@@ -67,17 +67,24 @@ function getLangs(product) {
   return JSON.stringify(langs);
 };
 
-function getFooter(product, colIndex, rowIndex) {
+function getFooter(footer) {
   // Get spreadsheet
   var ss = SpreadsheetApp.openById(ssId);
   // Select tab using product/tab name
-  var sheet = ss.getSheetByName(product);
-  var row = Number(rowIndex + 2);
-  var col = Number(colIndex + firstCol);
-  var footer = sheet.getRange(row, col).getValue();
+  var sheet = ss.getSheetByName(footer.product);
+  var row = Number(footer.lang) + 2;
+  var col = Number(footer.offer) + firstCol;
+  Logger.log("row: " + row);
+  Logger.log("col: " + col);
+  try {
+    var footerContent = sheet.getRange(row, col).getValue();
+  } catch(err) {
+    Logger.log("row: " + row);
+    Logger.log("col: " + col);
+  };
   // Client side functions can only return strings
   // so the array must be converted first
-  return JSON.stringify(footer)
+  return JSON.stringify(footerContent)
 };
 
 function doGet() {

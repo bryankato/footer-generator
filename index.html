@@ -91,6 +91,7 @@
     // can only return a string
     // so it must be parsed first
     var footer = JSON.parse(footerObj);
+    // Create filter for curly quotes, etc
     console.log(footer);
     $("#footer-content").text(footer);
   };
@@ -105,16 +106,16 @@
     google.script.run.withSuccessHandler(showOfferTypes).getOfferTypes(product);
     google.script.run.withSuccessHandler(showLangs).getLangs(product);
   });
-  // Look up footer whenever language is changed
+  // Look up footer when CTA is clicked
   $("#footer").click(function() {
-    // Get selected product
-    var product = $("#products").val();
-    var offer = $("#offer-type").val();
-    var lang = $("#langs").val();
-    console.log("product: " + product);
-    console.log("offer: " + offer);
-    console.log("lang: " + lang);
-    // Get offer types for selected product
-    google.script.run.withSuccessHandler(showFooter).getFooter(product, offer, lang);
+    // Intialize footer parameter object
+    var footerParams = {};
+    // Add footer parameters to object
+    footerParams.product = $("#products").val();
+    footerParams.offer = $("#offer-type").val();
+    footerParams.lang = $("#langs").val();
+    console.log(footerParams);
+    // Get footer content using defined parameters
+    google.script.run.withSuccessHandler(showFooter).getFooter(footerParams);
   });
 </script>
