@@ -182,8 +182,8 @@
     // Remove existing options
     $(".langs-option").remove();
     // Add existing languages
-    for(var i = 0; i < objSize(langs); i++) {
-      $('<option />', {class: "langs-option", value: i, text: langs[i][0] + " - " + langs[i][1]}).appendTo($("#langs-select"));
+    for(var i = 0; i < langs.length; i++) {
+      $('<option />', {class: "langs-option", value: langs[i].row, text: langs[i].langCode + " - " + langs[i].langName}).appendTo($("#langs-select"));
     }
     // Reset placeholder option
     $("#lang-placeholder").text("Select your language");

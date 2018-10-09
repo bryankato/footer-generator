@@ -65,12 +65,18 @@ function getLangs(footer) {
   // Get offer column
   var col = Number(footer.offer) + firstCol;
   // Get content
-  var footersRange = sheet.getRange(2, col, numRows, 2);
+  var footersRange = sheet.getRange(2, col, numRows, 1);
   var footers = footersRange.getValues();
-  var validLangs = {};
+  var validLangs = [];
   for (var i = 0; i < numRows; i++) {
     if(footers[i].toString().trim()) {
-      validLangs[i] = langs[i];
+      validLangs.push(
+        {
+          "row" : i + 2,
+          "langCode" : langs[i][0],
+          "langName" : langs[i][1],
+        }
+      );
     };
   };
   // Stringify array
@@ -82,10 +88,8 @@ function getFooter(footer) {
   var ss = SpreadsheetApp.openById(ssId);
   // Select tab using product/tab name
   var sheet = ss.getSheetByName(footer.product);
-  var row = Number(footer.lang) + 2;
+  var row = Number(footer.lang);
   var col = Number(footer.offer) + firstCol;
-  Logger.log("row: " + row);
-  Logger.log("col: " + col);
   var footerContent = sheet.getRange(row, col).getValue();
   // Filter footer content based on user options
   footerContent = footerFilter(footerContent, footer.filters);
@@ -113,5 +117,9 @@ function doGet() {
   // Merge data with template
   htmlTemplate.data = data;
   // Render the template with data
-  return htmlTemplate.evaluate();
+  var output = HtmlService.createHtmlOutput(htmlTemplate.evaluate());
+  // Set favicon and title
+  // output.setFaviconUrl('https://services.google.com/fh/files/emails/proofing_tool_favicon_128x128.png');
+  output.setTitle("go/Footer2 - Email Footer Tool");
+  return output;
 };
