@@ -52,18 +52,29 @@ function getOfferTypes(product) {
   return JSON.stringify(offerTypes);
 };
 
-function getLangs(product) {
+function getLangs(footer) {
   // Get spreadsheet
   var ss = SpreadsheetApp.openById(ssId);
   // Select tab using product/tab name
-  var sheet = ss.getSheetByName(product);
+  var sheet = ss.getSheetByName(footer.product);
   // Get number of rows
   var numRows = sheet.getLastRow() - 1;
   // Get langs
   var langsRange = sheet.getRange(2, 1, numRows, 2);
   var langs = langsRange.getValues();
+  // Get offer column
+  var col = Number(footer.offer) + firstCol;
+  // Get content
+  var footersRange = sheet.getRange(2, col, numRows, 2);
+  var footers = footersRange.getValues();
+  var validLangs = {};
+  for (var i = 0; i < numRows; i++) {
+    if(footers[i].toString().trim()) {
+      validLangs[i] = langs[i];
+    };
+  };
   // Stringify array
-  return JSON.stringify(langs);
+  return JSON.stringify(validLangs);
 };
 
 function getFooter(footer) {

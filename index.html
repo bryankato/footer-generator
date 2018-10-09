@@ -1,127 +1,247 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <base target="_top">
-    <style>
-      font {
-        font-family: Roboto;
-        font-size: 14px;
-        line-height: 20px;
-      }
-      #footer {
-        padding: 10px;
-        margin: 10px 0;
-        cursor: pointer;
-        background-color: tomato;
-        color: white;
-        display: inline-block;
-      }
-      #footer-display,
-      #footer-source {
-        border: 1px solid #ededed;
-        padding: 10px;
-        font-size: 14px;
-        line-height: 20px;
-      }
-      #footer-display {
-        font-family: Roboto;
-      }
-      #footer-source {
-        font-family: Courier New;
-      }
-    </style>
-  </head>
-  <body>
-    <form id="footer-select" autocomplete="on" onsubmit="dummySubmit(); return false;">
-      <section id="products">
-        <font>Select product : </font>
-        <select name="products" id="products-select">
-          <option value="" disabled selected>Select your product</option>
-          <? for (var i = 0; i < data.products.length; i++) { ?>
-            <option value="<?= data.products[i] ?>"><?= data.products[i] ?></option>
-          <? } ?>
-        </select>
-      </section>
-      <section id="offers">
-        <font>Select offer type : </font>
-        <!-- Append offer type dropdown here -->
-      </section>
-      <section id="langs">
-        <font>Select language : </font>
-        <!-- Append language dropdown here -->
-      </section>
-      <font id="footer">Show my footer</font>
-      <br/>
-      <font>Footer display</font>
-      <section id="footer-display">
-      </section>
-      <font>Footer source</font>
-      <section id="footer-source">
-      </section>
-    </form>
-  </body>
-</html>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+  }
+  h1 {
+    color: #0097A7;
+    font-family: "Google Sans", 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 25px;
+    font-weight: normal;
+    line-height: 30px;
+    margin: 0;
+  }
+  h2, h3 {
+    font-family: "Google Sans", 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: normal;
+  }
+  font, label, textarea, input {
+    font-family: "Roboto", 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: normal;
+  }
+  h2 {
+    color: #0097A7;
+    font-size: 14pt;
+    line-height: 29px;
+    margin: 0 0 20px 0;
+  }
+  h3 {
+    color: #202124;
+    font-size: 16px;
+    font-weight: 500;
+    margin: 0;
+  }
+  font {
+    display: block;
+    margin: 15px 0 8px 0;
+  }
+  font, label {
+    color: #202124;
+    font-size: 14px;
+  }
+  label {
+    display: inline-block;
+    margin: 0 0 8px 0;
+  }
+  header {
+    background-color: #f5f5f5;
+    border-bottom: 1px solid #f1f1f1;
+    box-sizing: border-box;
+    height: 60px;
+    padding: 15px 30px;
+  }
+  section {
+    padding: 15px 30px;
+  }
+  .input {
+    background-color: #0097A7;
+    border-radius: 16px;
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 14px;
+    letter-spacing: -.2px;
+    line-height: 32px;
+    margin: 25px 0 0 0;
+    outline: none;
+    padding: 0 20px;
+    text-transform: capitalize;
+  }
+  #footer-display,
+  #footer-source {
+    border: 1px solid #ededed;
+    padding: 10px;
+    font-size: 14px;
+    line-height: 20px;
+  }
+  #footer-display > font {
+    font-family: Roboto;
+    margin: 0;
+  }
+  #footer-source > font {
+    font-family: Courier New;
+    margin: 0;
+  }
+</style>
+<!DOCTYPE html>
+<header>
+  <h1>go/Footer2</h1>
+</header>
+<!-- Footer form options -->
+<section id="footer-form">
+  <h2>Select your email footer options</h2>
+  <form id="footer-select" autocomplete="on" onsubmit="dummySubmit(); return false;">
+    <div id="products">
+      <label>Product/Brand: </label>
+      <select name="products" id="products-select">
+        <option value="" disabled selected>Select your product</option>
+        <? for (var i = 0; i < data.products.length; i++) { ?>
+          <option value="<?= data.products[i] ?>"><?= data.products[i] ?></option>
+        <? } ?>
+      </select>
+    </div>
+    <div id="offers">
+      <label>Offer-Type/Opt-in Category: </label>
+      <select name="offerTypes" id="offers-select">
+        <option value="" disabled selected id="offer-placeholder">Select your offer-type</option>
+        <!-- Append offer-type dropdown here -->
+      </select>
+    </div>
+    <div id="langs">
+      <label>Language/Region: </label>
+      <select name="langs" id="langs-select">
+        <option value="" disabled selected id="lang-placeholder">Select your language</option>
+        <!-- Append offer-type dropdown here -->
+      </select>
+      <!-- Append language dropdown here -->
+    </div>
+    <!-- <font id="footer-loading"></font> -->
+    <!-- <font id="get-footer" class="input">Get my footer</font> -->
+  </form>
+</section>
+<!-- Footer displays -->
+<section>
+  <h2>Footers</h2>
+  <!-- Footer pretty display -->
+  <font>Display version:</font>
+  <section id="footer-display">
+    <!-- Rendered HTML goes here -->
+    <font id="footer-display-inner"></font>
+  </section>
+  <!-- Footer source view -->
+  <font>Source version:</font>
+  <section id="footer-source">
+    <!-- HTML source goes here -->
+    <font id="footer-source-inner"></font>
+  </section>
+</section>
 <!-- Load JS last as per https://developers.google.com/apps-script/guides/html/best-practices -->
 <!-- jQuery -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script>
+  // Helper functions
+  function objSize(obj) {
+    var size = 0, key;
+    for (key in obj) {
+      if (obj.hasOwnProperty(key)) size++;
+    }
+    return size;
+  };
+  // On load functions
   $( document ).ready(function() {
-    // Hide offer type and language dropdowns on initial loading
-    // $("#offer-select").hide();
-    // $("#lang-select").hide();
+    // Hide offer-type and language dropdowns on initial loading
+    $("#offers-select").prop('disabled', true);
+    $("#langs-select").prop('disabled', true);
   });
-  function showOfferTypes(offerObj) {
+  function loading(id, message) {
+    $(id).text(message).fadeIn(200);
+  };
+  // Get offer-types and add to dropdown
+  function updateOfferTypes(offerObj) {
     // Client side success handler
     // can only return a string
     // so it must be parsed first
     var offerTypes = JSON.parse(offerObj)[0];
-    // Remove existing dropdown
-    $("#offers-select").remove();
-    // $("#offer-select").show();
-    // Create select/dropdown element
-    var s = $("<select />", {name: "offerTypes", id : "offers-select"});
-    // Add existing offer types
+    // Remove existing options
+    $(".offers-option").remove();
+    // Add new offer-types options
     for(var i in offerTypes) {
-      $('<option />', {value: i, text: offerTypes[i]}).appendTo(s);
+      $('<option />', {class: "offers-option", value: i, text: offerTypes[i]}).appendTo($("#offers-select"));
     }
-    // Add the dropdown to the form
-    s.appendTo("#offers");
+    // Reset placeholder option
+    $("#offer-placeholder").text("Select your offer-type");
+    // Enable dropdown selection
+    $("#offers-select").prop('disabled', false);
   };
-  function showLangs(langObj) {
+  // Get languages and add to dropdown
+  function updateLangs(langObj) {
     // Parse string
     var langs = JSON.parse(langObj);
-    // Remove existing dropdown
-    $("#langs-select").remove();
-    // $("#lang-select").show();
-    // Create select/dropdown element
-    var s = $("<select />", {name: "langs", id : "langs-select"});
+    // Remove existing options
+    $(".langs-option").remove();
     // Add existing languages
-    for(var i in langs) {
-      $('<option />', {value: i, text: langs[i][0] + " - " + langs[i][1]}).appendTo(s);
+    for(var i = 0; i < objSize(langs); i++) {
+      $('<option />', {class: "langs-option", value: i, text: langs[i][0] + " - " + langs[i][1]}).appendTo($("#langs-select"));
     }
-    // Add the dropdown to the form
-    s.appendTo("#langs");
+    // Reset placeholder option
+    $("#lang-placeholder").text("Select your language");
+    // Enable dropdown selection
+    $("#langs-select").prop('disabled', false);
   };
+  // Get footer content and add to displays
   function showFooter(footerObj) {
+    $("#footer-display-inner").fadeOut(200);
+    $("#footer-source-inner").fadeOut(200);
     // Parse string
     var footer = JSON.parse(footerObj);
     // Display footer content and source
-    $("#footer-display").html(footer);
-    $("#footer-source").text(footer);
+    $("#footer-display-inner").html(footer).hide().fadeIn(200);
+    $("#footer-source-inner").text(footer).hide().fadeIn(200);
   };
-  // Look up offerTypes whenever product is changed
+  // ******* ON PRODUCT CHANGE
+  // ******* Look up offerTypes whenever product is changed
   $("#products-select").change(function() {
-    // Hide offer and language dropdowns when product is updated
-    $("#offers-select").hide();
-    $("#langs-select").hide();
+    // Clear footer content
+    $("#footer-display-inner").fadeOut(200);
+    $("#footer-source-inner").fadeOut(200);
+    // Disable offer and lang dropdown selection
+    $("#offers-select").prop('disabled', true);
+    $("#langs-select").prop('disabled', true);
+    // Reset offer and lang selections
+    $("#offers-select").val("");
+    $("#langs-select").val("");
+    // Reset placeholder option
+    $("#offer-placeholder").text("Fetching offer-types...");
     // Get selected product
     var product = $("#products-select").val();
-    // Get offer types for selected product
-    google.script.run.withSuccessHandler(showOfferTypes).getOfferTypes(product);
-    google.script.run.withSuccessHandler(showLangs).getLangs(product);
+    // Get offer-types for selected product
+    google.script.run.withSuccessHandler(updateOfferTypes).getOfferTypes(product);
   });
-  // Look up footer when CTA is clicked
-  $("#footer").click(function() {
+  // ******* ON OFFER CHANGE
+  // ******* Look up languages whenever offer-type is changed
+  $("#offers-select").change(function() {
+    // Disable lang dropdown selection
+    $("#langs-select").prop('disabled', true);
+    // Reset lang selections
+    $("#langs-select").val("");
+    // Reset placeholder option
+    $("#lang-placeholder").text("Fetching languages...");
+    // Intialize footer parameter object
+    var footerParams = {};
+    // Add footer parameters to object
+    footerParams.product = $("#products-select").val();
+    footerParams.offer = $("#offers-select").val();
+    // Get offer-types for selected product
+    google.script.run.withSuccessHandler(updateLangs).getLangs(footerParams);
+  });
+  // ******* ON LANGUAGE CHANGE
+  // ******* Look up footer when language is selected
+  $("#langs-select").change(function() {
+    // Show footer loading message
+    $("#footer-display-inner").hide().html("Fetching footer...").fadeIn(200);
+    $("#footer-source-inner").hide().text("Fetching footer...").fadeIn(200);
     // Intialize footer parameter object
     var footerParams = {};
     // Add footer parameters to object
