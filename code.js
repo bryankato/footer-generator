@@ -12,7 +12,19 @@ var firstCol = 3;
 // get footer content
 // show footer content
 function test() {
-  Logger.log("test worked");
+  // Logger.log("test worked");
+};
+
+// Global functions
+function checkReplaced(haystack, needle) {
+  // Logger.log("searching for: " + needle);
+  // Check if term was replaced
+  if (haystack.search(needle) >= 0) {
+    return true;
+  } else {
+    // Logger.log("no matching terms found");
+    return false;
+  };
 };
 
 // Get a list of products/tabs
@@ -88,22 +100,159 @@ function getFooter(footer) {
   var ss = SpreadsheetApp.openById(ssId);
   // Select tab using product/tab name
   var sheet = ss.getSheetByName(footer.product);
-  var row = Number(footer.lang);
+  var lang = footer.lang.split(",");
+  var row = Number(lang[0]);
   var col = Number(footer.offer) + firstCol;
   var footerContent = sheet.getRange(row, col).getValue();
   // Filter footer content based on user options
-  footerContent = footerFilter(footerContent, footer.filters);
+  footerContent = footerFilter(footerContent, lang[1], footer.filters);
   // Stringify content
   return JSON.stringify(footerContent)
 };
 
-function footerFilter(content, filter) {
+function footerFilter(content, lang, filter) {
+  // Logger.log("lang: " + lang);
+  // Optout copy library
+  // Based on GMB footers
+  // Needs to expanded
+  var optout = {
+    "af" : "teken asseblief hier uit",
+    "am" : "እዚህ ከደንበኝነት ምዝገባ ይውጡ",
+    "ar" : "يُرجى إلغاء الاشتراك من هنا",
+    "bg" : "отпишете се тук",
+    "bn" : "এখানে সদস্যতা পরিত্যাগ করুন।",
+    "ca" : "cancel·la'n la subscripció",
+    "cs" : "jejich odběr zde",
+    "da" : "kan du afmelde dem her",
+    "de" : "melden Sie sich hier ab",
+    "el" : "καταργήστε την εγγραφή σας εδώ",
+    "en_gb" : [
+                "unsubscribe here",
+                ["unsubscribe here: ${optout()}", "unsubscribe here"],
+                ["click here: ${optout()}", "click here"]
+              ],
+    "en_us" : [
+                "unsubscribe here",
+                ["unsubscribe here: ${optout()}", "unsubscribe here"],
+                ["click here: ${optout()}", "click here"]
+              ],
+    "es" : "cancelar la suscripción en esta página",
+    "es-419" : "puedes anular la suscripción aquí",
+    "et" : "tühistage nende tellimus siin",
+    "eu" : "kendu harpidetza hemen",
+    "fa" : "کنید، لطفاً اشتراکتان را اینجا لغو کنید",
+    "fi" : "peruuta tilaus täällä",
+    "fil" : "mangyaring mag-unsubscribe dito",
+    "fr" : "veuillez vous désabonner",
+    "fr_ca" : "veuillez vous désabonner ici",
+    "gl" : "cancela a subscrición aquí",
+    "gu" : "કૃપા કરીને અહીં અનસબ્સ્ક્રાઇબ કરો",
+    "hi" : "तो कृपया यहां सदस्यता छोड़ें",
+    "hr" : "pretplatu otkažite ovdje",
+    "hu" : "iratkozz le itt",
+    "id" : "silakan berhenti berlangganan di sini",
+    "is" : "skaltu afskrá þig hér",
+    "it" : "annulla l'iscrizione qui",
+    "iw" : "בטל את הרישום כאן",
+    "ja" : "こちらから配信停止の手続きを行ってください",
+    "kn" : "ಇಲ್ಲಿ ಅನ್‌ಸಬ್‌ಸ್ಕ್ರೈಬ್‌‌ ಮಾಡಿ",
+    "ko" : "여기에서 수신거부를 요청하세요",
+    "lt" : "atšaukti prenumeratą",
+    "lv" : "anulējiet abonementu šeit",
+    "ml" : "ഇവിടെ അൺസബ്‌സ്‌ക്രൈബ് ചെയ്യുക",
+    "mr" : "कृपया येथे सदस्यता रद्द करा",
+    "ms" : "sila nyahlanggan di sini",
+    "nl" : "kunt u zich hier afmelden",
+    "no" : "kan du avslutte abonnementet her",
+    "pl" : "zrezygnuj z subskrypcji tutaj",
+    "pt_br" : "cancele sua inscrição aqui",
+    "pt_pt" : "anule a subscrição aqui",
+    "ro" : "dezabonează-te aici",
+    "ru" : "здесь",
+    "sk" : "zrušte ich odber",
+    "sl" : "se odjavite tukaj",
+    "sr" : "опозовите пријаву овде",
+    "sv" : "avsluta prenumerationen här",
+    "sw" : "tafadhali jiondoe hapa",
+    "ta" : "இங்கே குழுவிலகவும்",
+    "te" : "దయచేసి చందాను ఇక్కడ తొలగించండి",
+    "th" : "ยกเลิกการรับข่าวสารที่นี่",
+    "tr" : "aboneliğinizi buradan iptal edebilirsiniz",
+    "uk" : "скасуйте підписку тут",
+    "ur" : "تو براہ کرم یہاں اَن سبسکرائب کریں۔ ",
+    "vi" : "hủy đăng ký tại đây",
+    "zh_cn" : "请在此处退订",
+    "zh_hk" : "請在此取消訂閱",
+    "zh_tw" : "請在這裡取消訂閱",
+    "zu" : "sicela uzikhiphe ohlwini lapha"
+  };
   if (filter.smartQuotes) {
     // Remove double quotes
     content = content.replace(/“|”/g, '"');
     // Remove single quotes
     content = content.replace(/‘|’/g, "'");
-  }
+  };
+  if (filter.optoutLink) {
+    // Logger.log("optoutlink filter running");
+    var terms = optout[lang];
+    // Logger.log("terms: " + terms);
+    // Check if there are multiple optout terms
+    if (Array.isArray(terms)) {
+      // Logger.log("multiple optout terms detected");
+      // Initialize list of possible content
+      var contentVersions = [];
+      for (i in terms) {
+        var term = terms[i];
+        // Logger.log("term: " + term);
+        // Check if optout URL already exists in term
+        if (Array.isArray(term)) {
+          // Logger.log("optout with URL detected");
+          // Replace optout URL with hyperlinked version
+          var newTerm = "<a href=\"${optout}\">" + term[1] + "</a>";
+          // Logger.log("find: " + term[0]);
+          var contentVersion = content.replace(term[0], newTerm);
+          var contentLength = contentVersion.length;
+          // Check if term was replaced
+          var termReplaced = checkReplaced(contentVersion, newTerm);
+          if (termReplaced) {
+            contentVersions.push({contentLength: contentVersion});
+          };
+        } else {
+          // Logger.log("optout without URL detected");
+          // Logger.log("find: " + term);
+          var newTerm = "<a href=\"${optout}\">" + term + "</a>";
+          Logger.log(content);
+          var contentVersion = content.replace(term, newTerm);
+          var contentLength = contentVersion.length;
+          // Check if term was replaced
+          var termReplaced = checkReplaced(contentVersion, newTerm);
+          if (termReplaced) {
+            contentVersions.push({contentLength: contentVersion});
+          };
+        };
+      };
+      // Logger.log("contentVersions: " + contentVersions)
+      // Find the length of the shortest content version
+      var minLength = Math.min.apply(Math, contentVersions.map(function(str) { return str.length; }));
+      // Logger.log("char count of shortest versions: " + minLength);
+      for (content in contentVersions) {
+        // Logger.log("content version: " + content)
+      };
+      // If no matching terms found
+      if (!contentVersions.length) {
+        return content;
+      };
+      content = contentVersions[minLength];
+    } else {
+      // Logger.log("single optout term detected");
+      content = content.replace(terms, "<a href=\"${optout}\">" + terms + "</a>");
+      // Logger.log("optoutLink Content: " + content);
+      // If no matching terms found
+      if (!termReplaced) {
+        return content;
+      };
+    };
+  };
   return content;
 };
 

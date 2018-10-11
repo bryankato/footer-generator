@@ -183,7 +183,7 @@
     $(".langs-option").remove();
     // Add existing languages
     for(var i = 0; i < langs.length; i++) {
-      $('<option />', {class: "langs-option", value: langs[i].row, text: langs[i].langCode + " - " + langs[i].langName}).appendTo($("#langs-select"));
+      $('<option />', {class: "langs-option", value: [langs[i].row,langs[i].langCode], text: langs[i].langCode + " - " + langs[i].langName}).appendTo($("#langs-select"));
     }
     // Reset placeholder option
     $("#lang-placeholder").text("Select your language");
@@ -252,6 +252,7 @@
     footerParams.filters = {};
     // Set smart quote filter to "on" by default
     footerParams.filters.smartQuotes = true;
+    footerParams.filters.optoutLink = true;
     // Get footer content using defined parameters
     google.script.run.withSuccessHandler(showFooter).getFooter(footerParams);
   });
