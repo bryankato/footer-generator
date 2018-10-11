@@ -12,19 +12,26 @@ var firstCol = 3;
 // get footer content
 // show footer content
 function test() {
-  // Logger.log("test worked");
 };
 
 // Global functions
 function checkReplaced(haystack, needle) {
-  // Logger.log("searching for: " + needle);
+  Logger.log(haystack.indexOf(needle));
   // Check if term was replaced
-  if (haystack.search(needle) >= 0) {
+  if (haystack.indexOf(needle) >= 0) {
     return true;
   } else {
-    // Logger.log("no matching terms found");
     return false;
   };
+};
+function getShorty(list) {
+  var listLengths = [];
+  for (i in list) {
+    listLengths.push(list[i].length);
+  };
+  var shortest = Math.min(...listLengths);
+  var shortestIndex = listLengths.indexOf(shortest);
+  return list[shortestIndex];
 };
 
 // Get a list of products/tabs
@@ -111,7 +118,6 @@ function getFooter(footer) {
 };
 
 function footerFilter(content, lang, filter) {
-  // Logger.log("lang: " + lang);
   // Optout copy library
   // Based on GMB footers
   // Needs to expanded
@@ -193,23 +199,17 @@ function footerFilter(content, lang, filter) {
     content = content.replace(/‘|’/g, "'");
   };
   if (filter.optoutLink) {
-    // Logger.log("optoutlink filter running");
     var terms = optout[lang];
-    // Logger.log("terms: " + terms);
     // Check if there are multiple optout terms
     if (Array.isArray(terms)) {
-      // Logger.log("multiple optout terms detected");
       // Initialize list of possible content
       var contentVersions = [];
       for (i in terms) {
         var term = terms[i];
-        // Logger.log("term: " + term);
         // Check if optout URL already exists in term
         if (Array.isArray(term)) {
-          // Logger.log("optout with URL detected");
           // Replace optout URL with hyperlinked version
           var newTerm = "<a href=\"${optout}\">" + term[1] + "</a>";
-          // Logger.log("find: " + term[0]);
           var contentVersion = content.replace(term[0], newTerm);
           var contentLength = contentVersion.length;
           // Check if term was replaced
@@ -218,10 +218,8 @@ function footerFilter(content, lang, filter) {
             contentVersions.push({contentLength: contentVersion});
           };
         } else {
-          // Logger.log("optout without URL detected");
-          // Logger.log("find: " + term);
           var newTerm = "<a href=\"${optout}\">" + term + "</a>";
-          Logger.log(content);
+          // REPLACE NOT WORKING
           var contentVersion = content.replace(term, newTerm);
           var contentLength = contentVersion.length;
           // Check if term was replaced
@@ -231,22 +229,13 @@ function footerFilter(content, lang, filter) {
           };
         };
       };
-      // Logger.log("contentVersions: " + contentVersions)
-      // Find the length of the shortest content version
-      var minLength = Math.min.apply(Math, contentVersions.map(function(str) { return str.length; }));
-      // Logger.log("char count of shortest versions: " + minLength);
-      for (content in contentVersions) {
-        // Logger.log("content version: " + content)
-      };
       // If no matching terms found
       if (!contentVersions.length) {
         return content;
       };
-      content = contentVersions[minLength];
+      content = getShorty(contentVersions);
     } else {
-      // Logger.log("single optout term detected");
       content = content.replace(terms, "<a href=\"${optout}\">" + terms + "</a>");
-      // Logger.log("optoutLink Content: " + content);
       // If no matching terms found
       if (!termReplaced) {
         return content;
