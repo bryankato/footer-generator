@@ -16,7 +16,6 @@ function test() {
 
 // Global functions
 function checkReplaced(haystack, needle) {
-  Logger.log(haystack.indexOf(needle));
   // Check if term was replaced
   if (haystack.indexOf(needle) >= 0) {
     return true;
@@ -134,13 +133,15 @@ function footerFilter(content, lang, filter) {
     "el" : "καταργήστε την εγγραφή σας εδώ",
     "en_gb" : [
                 "unsubscribe here",
-                ["unsubscribe here: ${optout()}", "unsubscribe here"],
-                ["click here: ${optout()}", "click here"]
+                ["unsubscribe here: ${optout()}", "<a href=\"${optout()}\">unsubscribe here</a>."],
+                ["click here: ${optout()}", "<a href=\"${optout()}\">click here</a>."],
+                ["clicking here: ${OptoutID}","clicking <a href=\"${OptoutID}\">here</a>."]
               ],
     "en_us" : [
                 "unsubscribe here",
-                ["unsubscribe here: ${optout()}", "unsubscribe here"],
-                ["click here: ${optout()}", "click here"]
+                ["unsubscribe here: ${optout()}", "<a href=\"${optout()}\">unsubscribe here</a>."],
+                ["click here: ${optout()}", "<a href=\"${optout()}\">click here</a>."],
+                ["clicking here: ${OptoutID}","clicking <a href=\"${OptoutID}\">here</a>."]
               ],
     "es" : "cancelar la suscripción en esta página",
     "es-419" : "puedes anular la suscripción aquí",
@@ -209,23 +210,20 @@ function footerFilter(content, lang, filter) {
         // Check if optout URL already exists in term
         if (Array.isArray(term)) {
           // Replace optout URL with hyperlinked version
-          var newTerm = "<a href=\"${optout}\">" + term[1] + "</a>";
-          var contentVersion = content.replace(term[0], newTerm);
-          var contentLength = contentVersion.length;
+          var contentVersion = content.replace(term[0], term[1]);
           // Check if term was replaced
-          var termReplaced = checkReplaced(contentVersion, newTerm);
+          var termReplaced = checkReplaced(contentVersion, term[1]);
           if (termReplaced) {
-            contentVersions.push({contentLength: contentVersion});
+            contentVersions.push(contentVersion);
           };
         } else {
           var newTerm = "<a href=\"${optout}\">" + term + "</a>";
           // REPLACE NOT WORKING
           var contentVersion = content.replace(term, newTerm);
-          var contentLength = contentVersion.length;
           // Check if term was replaced
           var termReplaced = checkReplaced(contentVersion, newTerm);
           if (termReplaced) {
-            contentVersions.push({contentLength: contentVersion});
+            contentVersions.push(contentVersion);
           };
         };
       };
