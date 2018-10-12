@@ -15,6 +15,7 @@ function test() {
 };
 
 // Global functions
+// Determine if a string exists in a larger string
 function checkReplaced(haystack, needle) {
   // Check if term was replaced
   if (haystack.indexOf(needle) >= 0) {
@@ -23,6 +24,7 @@ function checkReplaced(haystack, needle) {
     return false;
   };
 };
+// Find the shortest string in an array
 function getShorty(list) {
   var listLengths = [];
   for (i in list) {
@@ -52,6 +54,7 @@ function getProducts(indexStart) {
   return products;
 };
 
+// Get offer types from a spreadsheet tab
 function getOfferTypes(product) {
   // Get spreadsheet
   var ss = SpreadsheetApp.openById(ssId);
@@ -70,6 +73,7 @@ function getOfferTypes(product) {
   return JSON.stringify(offerTypes);
 };
 
+// Get list of languages from a spreadsheet tab
 function getLangs(footer) {
   // Get spreadsheet
   var ss = SpreadsheetApp.openById(ssId);
@@ -85,6 +89,7 @@ function getLangs(footer) {
   // Get content
   var footersRange = sheet.getRange(2, col, numRows, 1);
   var footers = footersRange.getValues();
+  // Ignore languages with missing content
   var validLangs = [];
   for (var i = 0; i < numRows; i++) {
     if(footers[i].toString().trim()) {
@@ -101,6 +106,7 @@ function getLangs(footer) {
   return JSON.stringify(validLangs);
 };
 
+// Get footer content for specified product, offer type, and lang
 function getFooter(footer) {
   // Get spreadsheet
   var ss = SpreadsheetApp.openById(ssId);
@@ -116,6 +122,7 @@ function getFooter(footer) {
   return JSON.stringify(footerContent)
 };
 
+// Filter/reformat footer content
 function footerFilter(content, lang, filter) {
   // Optout copy library
   // Based on GMB footers
@@ -135,13 +142,15 @@ function footerFilter(content, lang, filter) {
                 "unsubscribe here",
                 ["unsubscribe here: ${optout()}", "<a href=\"${optout()}\">unsubscribe here</a>."],
                 ["click here: ${optout()}", "<a href=\"${optout()}\">click here</a>."],
-                ["clicking here: ${OptoutID}","clicking <a href=\"${OptoutID}\">here</a>."]
+                ["clicking here: ${OptoutID}","clicking <a href=\"${OptoutID}\">here</a>."],
+                ["click here to unsubscribe: ${optout()}","<a href=\"${optout()}\">click here</a> to unsubscribe."]
               ],
     "en_us" : [
                 "unsubscribe here",
                 ["unsubscribe here: ${optout()}", "<a href=\"${optout()}\">unsubscribe here</a>."],
                 ["click here: ${optout()}", "<a href=\"${optout()}\">click here</a>."],
-                ["clicking here: ${OptoutID}","clicking <a href=\"${OptoutID}\">here</a>."]
+                ["clicking here: ${OptoutID}","clicking <a href=\"${OptoutID}\">here</a>."],
+                ["click here to unsubscribe: ${optout()}","<a href=\"${optout()}\">click here</a> to unsubscribe."]
               ],
     "es" : "cancelar la suscripción en esta página",
     "es-419" : "puedes anular la suscripción aquí",
