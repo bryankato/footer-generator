@@ -217,7 +217,7 @@ function footerFilter(content, lang, filter) {
             contentVersions.push(contentVersion);
           };
         } else {
-          var newTerm = "<a href=\"${optout}\">" + term + "</a>";
+          var newTerm = "<a href=\"${optout()}\">" + term + "</a>";
           // REPLACE NOT WORKING
           var contentVersion = content.replace(term, newTerm);
           // Check if term was replaced
@@ -233,12 +233,16 @@ function footerFilter(content, lang, filter) {
       };
       content = getShorty(contentVersions);
     } else {
-      content = content.replace(terms, "<a href=\"${optout}\">" + terms + "</a>");
+      content = content.replace(terms, "<a href=\"${optout()}\">" + terms + "</a>");
       // If no matching terms found
       if (!termReplaced) {
         return content;
       };
     };
+  };
+  if (filter.emailAddress) {
+    // Unlink email address
+    content = content.replace("${EmailAddress}", "<a href=\"#\" class=\"unstyle-link\" style=\"color:inherit; cursor:text; font-size:inherit; line-height:inherit; pointer-events:none; text-decoration:none\">${EmailAddress}</a>");
   };
   return content;
 };
