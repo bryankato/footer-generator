@@ -1,0 +1,11 @@
+{
+  "@@author": "EPT",
+  "@@x-ept-variant-id": "0000000000000000",
+  "@@x-ept-export-version": "2.1.0",
+  "copyVarName": "<?= content ?>",
+  "@copyVarName": {
+    "source_text": "<?= content ?>",
+    "x-gtt-message-splitable": "true",
+    "x-ept-variable-id": "0000000000000000"
+  }
+}
