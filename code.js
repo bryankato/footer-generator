@@ -1,6 +1,9 @@
 // Global Variables
 // Id for the footer master trix
 var ssId = "1fY5Jadl0QP_H9-8DrhzCKH6SjwHZqlrMAmGHsJmUCFM";
+// Id for footer ARB folder
+// https://drive.google.com/corp/drive/folders/1XnQJhcF9kyuBtgu_dnA7BjrGxi9ter1G
+var footerArbFolderId = "1XnQJhcF9kyuBtgu_dnA7BjrGxi9ter1G"
 // Index of first tab containing footer content
 var firstTabIndex = 4;
 // Index of first column containing footer content
@@ -18,13 +21,41 @@ function checkReplaced(haystack, needle) {
 };
 // Find the shortest string in an array
 function getShorty(list) {
-  var listLengths = [];
-  for (i in list) {
-    listLengths.push(list[i].length);
-  };
+  // Get length on each item
+  let listLengths = list.map((item) => {
+    return item.length;
+  });
+  // Find the shortest length
   var shortest = Math.min(...listLengths);
+  // Find index of shortest item
   var shortestIndex = listLengths.indexOf(shortest);
+  // Return the shortest item
   return list[shortestIndex];
+};
+
+// Get a folder ID using its name
+function getFolderIdFromName(folderName) {
+  var folders = DriveApp.getFoldersByName(folderName);
+  while (folders.hasNext()) {
+    var folderId = folders.next().getId();
+  }
+  return folderId;
+};
+
+// Reformat footer trix lang codes to EPT/GAMMA format
+function langFormat(langs) {
+  let langsFormatted = langs.map((lang) => {
+    // Check for languages with region codes
+    let langSplit = lang.split("_");
+    // If region code exists reformat to match EPT lang-REGION
+    if (langSplit[1]) {
+      var output = langSplit[0] + "-" + langSplit[1].toUpperCase();
+    } else {
+      var output = langSplit[0];
+    };
+    return output;
+  });
+  return langsFormatted;
 };
 
 // Get a list of products/tabs
@@ -35,15 +66,14 @@ function getProducts(indexStart) {
   var ss = SpreadsheetApp.openById(ssId);
   // Get sheets/tabs/product names
   // All 3 names can be used interchangeably
-  var sheets = ss.getSheets();
-  // Initialize list of products
-  var products = [];
-  // Add sheets/tabs/product names to list
-  for (var i = indexStart; i < sheets.length; i++) {
-    var product = sheets[i].getName();
-    products.push(product);
-  };
-  return products;
+  var allSheets = ss.getSheets();
+  // Get rid of first few non-product tabs
+  var productSheets = allSheets.slice(indexStart);
+  // Get sheet/product names
+  let productNames = productSheets.map((productSheet) => {
+    return productSheet.getName();
+  });
+  return productNames;
 };
 
 // Get offer types from a spreadsheet tab
@@ -87,9 +117,9 @@ function getLangs(footer) {
     if(footers[i].toString().trim()) {
       validLangs.push(
         {
-          "row" : i + 2,
-          "langCode" : langs[i][0],
-          "langName" : langs[i][1],
+          row : i + 2,
+          langCode : langs[i][0],
+          langName : langs[i][1],
         }
       );
     };
@@ -406,7 +436,7 @@ function footerFilter(content, lang, filter) {
             contentVersions.push(contentVersion);
           };
         } else {
-          var newTerm = "<a href=\"${optout()}\">" + term + "</a>.";
+          var newTerm = "<a href=\"${optout()}\">" + term + "</a>";
           // REPLACE NOT WORKING
           var contentVersion = content.replace(term, newTerm);
           // Check if term was replaced
@@ -422,7 +452,7 @@ function footerFilter(content, lang, filter) {
       };
       content = getShorty(contentVersions);
     } else {
-      content = content.replace(terms, "<a href=\"${optout()}\">" + terms + "</a>.");
+      content = content.replace(terms, "<a href=\"${optout()}\">" + terms + "</a>");
       // If no matching terms found
       if (!termReplaced) {
         return content;
@@ -442,47 +472,37 @@ function doGet() {
   // Merge data with template
   htmlTemplate.data = data;
   // Render the template with data
-  var output = HtmlService.createHtmlOutput(htmlTemplate.evaluate());
+  // var output = HtmlService.createHtmlOutput(htmlTemplate.evaluate());
+  var output = htmlTemplate.evaluate();
   // Set favicon and title
   // output.setFaviconUrl('https://services.google.com/fh/files/emails/proofing_tool_favicon_128x128.png');
   output.setTitle("go/Footer2 - Email Footer Tool");
   return output;
 };
 
-function renderArb(product, offertype, langs, filters) {
-  // Create folder stucture
-  // Create ARBs for each folder
-  for (i in langs) {
-    var langObj = langs[i];
-    // Check for languages with region codes
-    var langSplit = lang.split("_");
-    var langFormatted = "";
-    // If region code exists reformat to match EPT lang-REGION
-    if (langSplit[1]) {
-      langFormatted = langSplit[0] + "-" langSplit[1].toUpperCase();
-    } else {
-      langFormatted = langSplit[0];
-    };
+function renderArb(content, copyVarName, folderId) {
+  // Get footer content
+  // Dummy values
+  // var copyVarName = "optout";
+  // var content = "test";
+  // var folderId = footerArbFolderId;
+  var arbString = "{\n\"@@author\": \"EPT\",\"@@x-ept-variant-id\": \"0000000000000000\",\n\"@@x-ept-export-version\": \"2.1.0\",\n\"" + copyVarName + "\": \"" + content + "\",\n\"@" + copyVarName + "\": {\n\"source_text\": \"" + content + "\",\n\"x-gtt-message-splitable\": \"true\",\n\"x-ept-variable-id\": \"0000000000000000\"\n}\n}";
+  DriveApp.getFolderById(folderId).createFile("footer_tool.arb", arbString);
+};
 
-    var footer = {};
-    // Get product
-    footer.product = product;
-    // Get offer type
-    footer.offer = offerType;
-    // Get language
-    footer.lang = [];
-    footer.lang.push(langObj[lang]);
-    footer.lang.push(langObj[row]);
-    // Get filters
-    footer.filters = fitlers;
+function createArbFolders(parentFolderId, langs) {
+  // Create timestamp
+  var timeStamp = Date.now();
+  // Create folder for export
+  DriveApp.getFolderById(parentFolderId).createFolder("gofooter2_" + timeStamp);
+  var exportFolderId = getFolderIdFromName("gofooter2_" + timeStamp);
+  // Create language subfolders
+  var EptLangs = langFormat(langs);
+  for (i in EptLangs) {
+    DriveApp.getFolderById(exportFolderId).createFolder(EptLangs[i]);
+  }
+};
 
-    var arbTemplate = HtmlService.createTemplateFromFile("arbTemplate");
-    var data = {};
-    // Get footer for each lang
-    data.content = getFooter(footer);
-    arbTemplate.data = data;
-    var output = HtmlService.createHtmlOutput(arbTemplate.evaluate());
-  };
-  // Zip folder
-  // Download zip
+function folderTest() {
+  createArbFolders(footerArbFolderId, ["en_us","es-419"]);
 };
