@@ -152,7 +152,9 @@
 <script>
   // Global vars
   var rtlLangs = ["ar","arc","dv","fa","iw","ur"]
-  // Helper functions
+  // HELPER FUNCTIONS
+  // ****************
+  // Return the size of an object
   function objSize(obj) {
     var size = 0, key;
     for (key in obj) {
@@ -160,20 +162,20 @@
     }
     return size;
   };
-  // On load functions
+  // ON LOAD FUNCTIONS
+  // *****************
   $( document ).ready(function() {
     // Hide offer-type and language dropdowns on initial loading
     $("#offers-select").prop('disabled', true);
     $("#langs-select").prop('disabled', true);
   });
-  function loading(id, message) {
-    $(id).text(message).fadeIn(200);
-  };
+  // SCRIPT FUNCTIONS
+  // ****************
   // Get offer-types and add to dropdown
+  // ***********************************
   function updateOfferTypes(offerObj) {
-    // Client side success handler
-    // can only return a string
-    // so it must be parsed first
+    // Client side success handler can only return
+    // a string so it must be parsed first
     var offerTypes = JSON.parse(offerObj)[0];
     // Remove existing options
     $(".offers-option").remove();
@@ -187,6 +189,7 @@
     $("#offers-select").prop('disabled', false);
   };
   // Get languages and add to dropdown
+  // *********************************
   function updateLangs(langObj) {
     // Parse string
     var langs = JSON.parse(langObj);
@@ -201,7 +204,8 @@
     // Enable dropdown selection
     $("#langs-select").prop('disabled', false);
   };
-  // Get footer content and add to displays
+  // Show footer content in display boxes
+  // ************************************
   function showFooter(footerObj) {
     $("#footer-display-inner").fadeOut(200);
     $("#footer-source-inner").fadeOut(200);
@@ -211,11 +215,46 @@
     $("#footer-display-inner").html(footer).hide().fadeIn(200);
     $("#footer-source-inner").text(footer).hide().fadeIn(200);
   };
-  // ******* ON PRODUCT CHANGE
-  // ******* Look up offerTypes whenever product is changed
+  // Get footer content based on dropdown and option values
+  // ******************************************************
+  function loadFooter() {
+    // Intialize footer parameter object
+    var footerParams = {};
+    // Add footer parameters to object
+    footerParams.product = $("#products-select").val();
+    footerParams.offer = $("#offers-select").val();
+    footerParams.lang = $("#langs-select").val();
+    // Check for all required values
+    if (footerParams.product && footerParams.offer && footerParams.lang) {
+      // Show footer loading message
+      $("#footer-display-inner").hide().html("Fetching footer...").fadeIn(200);
+      $("#footer-source-inner").hide().text("Fetching footer...").fadeIn(200);
+      // Set language display direction
+      var lang = footerParams.lang.split(",")[1];
+      if (rtlLangs.indexOf(lang) >-1) {
+        $("#footer-display").prop("dir", "rtl");
+      } else {
+        $("#footer-display").prop("dir", "ltr");
+      };
+      // Intialize footer filter options
+      footerParams.filters = {};
+      // Set smart quote filter to "on" by default
+      footerParams.filters.smartQuotes = true;
+      // Get optout and email address filter options
+      footerParams.filters.optoutLink = $("#optout-link").is(":checked");
+      footerParams.filters.emailAddress = $("#email-address").is(":checked");
+      // Get footer content using defined parameters
+      // The google.script.run method runs functions from the server side Code.gs file
+      google.script.run.withSuccessHandler(showFooter).getFooter(footerParams);
+    }
+  };
+  // USER TRIGGERED FUNCTIONS
+  // ************************
+  // On product change
+  // *****************
+  // Look up existing offerTypes whenever product is changed
   $("#products-select").change(function() {
-    // Clear footer content
-    $("#footer-display-inner").fadeOut(200);
+    // Clear footer display boxes
     $("#footer-source-inner").fadeOut(200);
     // Disable offer and lang dropdown selection
     $("#offers-select").prop('disabled', true);
@@ -230,35 +269,9 @@
     // Get offer-types for selected product
     google.script.run.withSuccessHandler(updateOfferTypes).getOfferTypes(product);
   });
-  function loadFooter() {
-    // Intialize footer parameter object
-    var footerParams = {};
-    // Add footer parameters to object
-    footerParams.product = $("#products-select").val();
-    footerParams.offer = $("#offers-select").val();
-    footerParams.lang = $("#langs-select").val();
-    if (footerParams.product && footerParams.offer && footerParams.lang) {
-      // Show footer loading message
-      $("#footer-display-inner").hide().html("Fetching footer...").fadeIn(200);
-      $("#footer-source-inner").hide().text("Fetching footer...").fadeIn(200);
-      var lang = footerParams.lang.split(",")[1];
-      if (rtlLangs.indexOf(lang) >-1) {
-        $("#footer-display").prop("dir", "rtl");
-      } else {
-        $("#footer-display").prop("dir", "ltr");
-      };
-      // Intialize footer filter options
-      footerParams.filters = {};
-      // Set smart quote filter to "on" by default
-      footerParams.filters.smartQuotes = true;
-      footerParams.filters.optoutLink = $("#optout-link").is(":checked");
-      footerParams.filters.emailAddress = $("#email-address").is(":checked");
-      // Get footer content using defined parameters
-      google.script.run.withSuccessHandler(showFooter).getFooter(footerParams);
-    }
-  };
-  // ******* ON OFFER CHANGE
-  // ******* Look up languages whenever offer-type is changed
+  // On offer change
+  // ***************
+  // Look up existing languages whenever offer-type is changed
   $("#offers-select").change(function() {
     // Disable lang dropdown selection
     $("#langs-select").prop('disabled', true);
@@ -274,8 +287,9 @@
     // Get offer-types for selected product
     google.script.run.withSuccessHandler(updateLangs).getLangs(footerParams);
   });
-  // ******* ON LANGUAGE CHANGE
-  // ******* Look up footer when language is selected
+  // On language or options change
+  // ******************
+  // Look up footer when language or options are changed
   $("#langs-select").change(function() {
     loadFooter();
   });

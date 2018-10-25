@@ -10,6 +10,7 @@ var firstTabIndex = 4;
 var firstCol = 3;
 
 // Global functions
+// ****************
 // Determine if a string exists in a larger string
 function checkReplaced(haystack, needle) {
   // Check if term was replaced
@@ -58,9 +59,10 @@ function langFormat(langs) {
   return langsFormatted;
 };
 
-// Get a list of products/tabs
-// with option to define index
-// of first tab
+// Script functions
+// ****************
+// Get a list of products/tabs with
+// option to define index of first tab
 function getProducts(indexStart) {
   // Get spreadsheet
   var ss = SpreadsheetApp.openById(ssId);
@@ -128,8 +130,20 @@ function getLangs(footer) {
   return JSON.stringify(validLangs);
 };
 
-// Get footer content for specified product, offer type, and lang
+// Get footer content for specified product, offer-type, and lang
 function getFooter(footer) {
+  // footer arg contains an object with multiple parameters
+  // Example footer obj
+  // footer = {
+  //   product : "product name",
+  //   lang : "lanugage row number, language code",
+  //   offer : "offer column number",
+  //   filters : {
+  //     smartQuotes : true,
+  //     optoutLink : true,
+  //     emailAddress : true,
+  //   }
+  // }
   // Get spreadsheet
   var ss = SpreadsheetApp.openById(ssId);
   // Select tab using product/tab name
@@ -148,7 +162,7 @@ function getFooter(footer) {
 function footerFilter(content, lang, filter) {
   // Optout copy library
   // Based on GMB footers
-  // Needs to expanded
+  // Needs to expanded for each lang and product
   var optout = {
   "af" : [
     "teken asseblief hier uit",
@@ -462,6 +476,7 @@ function footerFilter(content, lang, filter) {
   return content;
 };
 
+// The doGet function runs everytime the user access the site
 function doGet() {
   // Create template from index.html file
   var htmlTemplate = HtmlService.createTemplateFromFile("index");
@@ -472,7 +487,6 @@ function doGet() {
   // Merge data with template
   htmlTemplate.data = data;
   // Render the template with data
-  // var output = HtmlService.createHtmlOutput(htmlTemplate.evaluate());
   var output = htmlTemplate.evaluate();
   // Set favicon and title
   // output.setFaviconUrl('https://services.google.com/fh/files/emails/proofing_tool_favicon_128x128.png');
@@ -480,6 +494,7 @@ function doGet() {
   return output;
 };
 
+// Create an ARB file in a specific folder
 function renderArb(content, copyVarName, folderId) {
   // Get footer content
   // Dummy values
@@ -490,6 +505,7 @@ function renderArb(content, copyVarName, folderId) {
   DriveApp.getFolderById(folderId).createFile("footer_tool.arb", arbString);
 };
 
+// Create ARB folder structure based on a list of lang codes in a specific folder
 function createArbFolders(parentFolderId, langs) {
   // Create timestamp
   var timeStamp = Date.now();
@@ -503,6 +519,7 @@ function createArbFolders(parentFolderId, langs) {
   }
 };
 
+// Test function
 function folderTest() {
   createArbFolders(footerArbFolderId, ["en_us","es-419"]);
 };
