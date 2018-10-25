@@ -85,7 +85,6 @@
     margin: 0;
   }
 </style>
-<!DOCTYPE html>
 <header>
   <h1>go/Footer2</h1>
 </header>
@@ -195,7 +194,7 @@
     var langs = JSON.parse(langObj);
     // Remove existing options
     $(".langs-option").remove();
-    // Add existing languages
+    // Add new languages
     for(var i = 0; i < langs.length; i++) {
       $('<option />', {class: "langs-option", value: [langs[i].row,langs[i].langCode], text: langs[i].langCode + " - " + langs[i].langName}).appendTo($("#langs-select"));
     }
@@ -207,11 +206,12 @@
   // Show footer content in display boxes
   // ************************************
   function showFooter(footerObj) {
+    // Clear any existing content
     $("#footer-display-inner").fadeOut(200);
     $("#footer-source-inner").fadeOut(200);
     // Parse string
     var footer = JSON.parse(footerObj);
-    // Display footer content and source
+    // Display new content
     $("#footer-display-inner").html(footer).hide().fadeIn(200);
     $("#footer-source-inner").text(footer).hide().fadeIn(200);
   };
@@ -244,7 +244,14 @@
       footerParams.filters.optoutLink = $("#optout-link").is(":checked");
       footerParams.filters.emailAddress = $("#email-address").is(":checked");
       // Get footer content using defined parameters
-      // The google.script.run method runs functions from the server side Code.gs file
+      // IMPORTANT NOTE ON SERVER-SIDE FUNCTIONS
+      // ***************************************
+      // The google.script.run method is able to run functions from the server-side Code.gs file
+      // In this case it runs the getFooter function.
+      // However getFooter, or any server-side function run by google.script.run, does not return anything by itself.
+      // Whatever getFooter returns will automatically be pass on to the withSuccessHandler function as an arg.
+      // In this case showFooter receives what getFooter returns.
+      // showFooter then parses the arg as JSON to string and displays the footer content.
       google.script.run.withSuccessHandler(showFooter).getFooter(footerParams);
     }
   };
